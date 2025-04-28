@@ -87,3 +87,8 @@ class User:
         except Exception as e:
             logging.error(f"Error downloading image: {e}")
             return {"message": "Error"}
+
+    def close_connection(self):
+        self.conn.close()
+
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
