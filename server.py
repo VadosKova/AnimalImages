@@ -102,3 +102,25 @@ def client_request(client):
         res = {"message": "Unknown action"}
 
         user = User(username=data.get('username'))
+
+        if action == 'register':
+            user = User(username=data['username'], email=data['email'], password=data['password'])
+            if user.check_username_exists():
+                res = {"message": "Username already registered"}
+            else:
+                user.register_user()
+                res = {"message": "Registration successful"}
+
+        elif action == 'login':
+            if user.check_login(data['password']):
+                is_admin = user.is_admin()
+                res = {"message": "Login successful", "is_admin": is_admin}
+            else:
+                res = {"message": "Invalid credentials"}
+
+    except Exception as e:
+        logging.error(f"Error: {e}")
+        error_res = {"error": "Error processing request"}
+        client.send(jsonpickle.encode(error_res).encode('utf-8'))
+    finally:
+        client.close()
