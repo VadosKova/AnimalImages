@@ -35,3 +35,7 @@ class User:
     def check_username_exists(self):
         self.cursor.execute('SELECT * FROM Users WHERE LOWER(Username) = LOWER(?)', (self.username,))
         return self.cursor.fetchone() is not None
+
+    def save_view_history(self, image_url):
+        self.cursor.execute('INSERT INTO History (UserID, ImageURL) VALUES ((SELECT UserID FROM Users WHERE Username = ?), ?)', (self.username, image_url))
+        self.conn.commit()
