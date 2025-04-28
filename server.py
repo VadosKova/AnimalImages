@@ -62,3 +62,14 @@ class User:
     def add_review(self, image_url, review_text):
         self.cursor.execute('INSERT INTO Reviews (UserID, ImageURL, ReviewText) VALUES ((SELECT UserID FROM Users WHERE Username = ?), ?, ?)', (self.username, image_url, review_text))
         self.conn.commit()
+
+    def get_favorites_with_reviews(self):
+        self.cursor.execute('SELECT f.ImageURL, r.ReviewText FROM Favorites f LEFT JOIN Reviews r ON f.ImageURL = r.ImageURL WHERE f.UserID = (SELECT UserID FROM Users WHERE Username = ?)', (self.username,))
+        result = self.cursor.fetchall()
+        favorites = []
+        for row in result:
+            favorites.append({
+                "image_url": row[0],
+                "review_text": row[1] if row[1] else "No review"
+            })
+        return favorites
