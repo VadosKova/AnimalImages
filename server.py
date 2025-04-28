@@ -39,3 +39,18 @@ class User:
     def save_view_history(self, image_url):
         self.cursor.execute('INSERT INTO History (UserID, ImageURL) VALUES ((SELECT UserID FROM Users WHERE Username = ?), ?)', (self.username, image_url))
         self.conn.commit()
+
+    def get_images(self, category):
+        if category == "cats":
+            response = requests.get('https://cataas.com/cat?json=true')
+            image_url = response.json().get('url')
+        elif category == "dogs":
+            response = requests.get('https://dog.ceo/dog-api/')
+            image_url = response.json().get('message')
+        elif category == "birds":
+            access_key = "zcM-4apdjE3GtYjE3g2MA3cyORU_Pntf5CD9OFCvNfI"
+            response = requests.get(f'https://api.unsplash.com/photos/random?query=bird&client_id={access_key}')
+            image_url = response.json()[0].get('urls').get('regular')
+        else:
+            image_url = None
+        return image_url
