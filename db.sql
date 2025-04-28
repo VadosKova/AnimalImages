@@ -1,0 +1,43 @@
+--CREATE DATABASE [AnimalImages]
+
+USE [AnimalImages]
+GO
+
+CREATE TABLE [Users] (
+    [UserID] INT IDENTITY(1,1) PRIMARY KEY,
+    [Username] VARCHAR(50),
+	[Email] VARCHAR(100),
+    [Password] VARCHAR(50),
+    [IsAdmin] BIT DEFAULT 0
+)
+
+CREATE TABLE [Favorites] (
+    [FavoriteID] INT IDENTITY(1,1) PRIMARY KEY,
+    [UserID] INT NOT NULL,
+    [ImageURL] VARCHAR(500) NOT NULL,
+    FOREIGN KEY (UserID) REFERENCES [Users](UserID)
+)
+
+CREATE TABLE [Reviews] (
+    [ReviewID] INT IDENTITY(1,1) PRIMARY KEY,
+    [ImageURL] VARCHAR(500) NOT NULL,
+    [ReviewText] VARCHAR(1000) NOT NULL,
+    [UserID] INT NOT NULL, 
+    FOREIGN KEY (UserID) REFERENCES [Users](UserID)
+)
+
+CREATE TABLE [History] (
+    [HistoryID] INT IDENTITY(1,1) PRIMARY KEY,
+    [UserID] INT NOT NULL,
+    [ImageURL] VARCHAR(500) NOT NULL,
+    [ViewDate] DATETIME DEFAULT GETDATE(),
+    FOREIGN KEY (UserID) REFERENCES [Users](UserID)
+)
+
+CREATE TABLE [UserLogs] (
+    [LogID] INT IDENTITY(1,1) PRIMARY KEY,
+    [UserID] INT NOT NULL,
+    [Action] VARCHAR(100) NOT NULL,
+    [LogDate] DATETIME DEFAULT GETDATE(),
+    FOREIGN KEY (UserID) REFERENCES [Users](UserID)
+)
