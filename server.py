@@ -152,6 +152,16 @@ def client_request(client):
             user.add_review(image_url, review_text)
             res = {"message": "Review added"}
 
+        elif action == 'view_image':
+            image_url = data['image_url']
+            user.save_view_history(image_url)
+            res = {"message": "Image view history saved"}
+
+        elif action == 'get_favorites':
+            favorites = user.get_favorites_with_reviews()
+            res = {"favorites": favorites}
+
+        client.send(jsonpickle.encode(res).encode('utf-8'))
     except Exception as e:
         logging.error(f"Error: {e}")
         error_res = {"error": "Error processing request"}
