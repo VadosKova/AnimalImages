@@ -118,6 +118,14 @@ def client_request(client):
             else:
                 res = {"message": "Invalid credentials"}
 
+        elif action == 'get_images':
+            category = data.get('category')
+            image_url = user.get_images(category)
+            if image_url:
+                res = {"image_url": image_url}
+            else:
+                res = {"message": "No found"}
+
     except Exception as e:
         logging.error(f"Error: {e}")
         error_res = {"error": "Error processing request"}
