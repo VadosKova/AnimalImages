@@ -15,7 +15,8 @@ CREATE TABLE [Favorites] (
     [FavoriteID] INT IDENTITY(1,1) PRIMARY KEY,
     [UserID] INT NOT NULL,
     [ImageURL] VARCHAR(500) NOT NULL,
-    FOREIGN KEY (UserID) REFERENCES [Users](UserID)
+    FOREIGN KEY (UserID) REFERENCES [Users](UserID),
+    CONSTRAINT UQ_Favorite UNIQUE (UserID, ImageURL)
 )
 
 CREATE TABLE [Reviews] (

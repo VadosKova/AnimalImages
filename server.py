@@ -54,3 +54,11 @@ class User:
         else:
             image_url = None
         return image_url
+
+    def add_favorite(self, image_url):
+        self.cursor.execute('INSERT INTO Favorites (UserID, ImageURL) VALUES ((SELECT UserID FROM Users WHERE Username = ?), ?)', (self.username, image_url))
+        self.conn.commit()
+
+    def add_review(self, image_url, review_text):
+        self.cursor.execute('INSERT INTO Reviews (UserID, ImageURL, ReviewText) VALUES ((SELECT UserID FROM Users WHERE Username = ?), ?, ?)', (self.username, image_url, review_text))
+        self.conn.commit()
