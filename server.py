@@ -3,6 +3,8 @@ import jsonpickle
 import pyodbc
 import requests
 import logging
+from PIL import Image
+import os
 
 
 class User:
@@ -74,16 +76,23 @@ class User:
             })
         return favorites
 
-    def download_image(self, image_url, save_path):
+    def download_image(self, image_url, image_name="downloaded"):
         try:
             response = requests.get(image_url, stream=True)
             if response.status_code == 200:
-                with open(save_path, 'wb') as file:
-                    for chunk in response.iter_content(1024):
-                        file.write(chunk)
-                return {"message": "Downloaded successfully", "image_path": save_path}
+                img = Image.open(response.raw)
+                file_type = img.format.lower()
+
+                os.makedirs("downloads", exist_ok=True)
+                file_path = os.path.join("downloads", f"{image_name}.{file_type}")
+
+                image_bytes = requests.get(image_url).content
+                with open(file_path, 'wb') as f:
+                    f.write(image_bytes)
+
+                return {"message": "Image downloaded", "image_path": file_path}
             else:
-                return {"message": "Failed to download"}
+                return {"message": "Failed to download", "status_code": response.status_code}
         except Exception as e:
             logging.error(f"Error downloading image: {e}")
             return {"message": "Error"}
@@ -125,6 +134,12 @@ def client_request(client):
                 res = {"image_url": image_url}
             else:
                 res = {"message": "No found"}
+
+        elif action == 'download_image':
+            image_url = data['image_url']
+            image_name = data.get('image_name', 'downloaded')
+            download_result = user.download_image(image_url, image_name)
+            res = download_result
 
     except Exception as e:
         logging.error(f"Error: {e}")
