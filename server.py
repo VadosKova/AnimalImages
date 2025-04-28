@@ -141,6 +141,17 @@ def client_request(client):
             download_result = user.download_image(image_url, image_name)
             res = download_result
 
+        elif action == 'add_favorite':
+            image_url = data['image_url']
+            user.add_favorite(image_url)
+            res = {"message": "Image added to favorites"}
+
+        elif action == 'add_review':
+            image_url = data['image_url']
+            review_text = data['review_text']
+            user.add_review(image_url, review_text)
+            res = {"message": "Review added"}
+
     except Exception as e:
         logging.error(f"Error: {e}")
         error_res = {"error": "Error processing request"}
