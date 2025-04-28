@@ -73,3 +73,17 @@ class User:
                 "review_text": row[1] if row[1] else "No review"
             })
         return favorites
+
+    def download_image(self, image_url, save_path):
+        try:
+            response = requests.get(image_url, stream=True)
+            if response.status_code == 200:
+                with open(save_path, 'wb') as file:
+                    for chunk in response.iter_content(1024):
+                        file.write(chunk)
+                return {"message": "Downloaded successfully", "image_path": save_path}
+            else:
+                return {"message": "Failed to download"}
+        except Exception as e:
+            logging.error(f"Error downloading image: {e}")
+            return {"message": "Error"}
