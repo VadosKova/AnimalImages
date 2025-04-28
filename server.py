@@ -92,3 +92,13 @@ class User:
         self.conn.close()
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
+
+def client_request(client):
+    try:
+        req = client.recv(4096).decode('utf-8')
+        data = jsonpickle.decode(req)
+        action = data.get('action')
+        res = {"message": "Unknown action"}
+
+        user = User(username=data.get('username'))
