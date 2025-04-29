@@ -217,6 +217,18 @@ class User:
             logging.error(f"Error deleting review: {e}")
             return False
 
+    def assign_admin_status(self, user_id, make_admin):
+        try:
+            with pyodbc.connect(self.connection_string) as conn:
+                cursor = conn.cursor()
+                cursor.execute('UPDATE Users SET IsAdmin = ? WHERE UserID = ?', (1 if make_admin else 0, user_id))
+                conn.commit()
+            self.log_action(f"{'Promoted to' if make_admin else 'Demoted from'} admin")
+            return True
+        except Exception as e:
+            logging.error(f"Error updating admin status: {e}")
+            return False
+
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 
