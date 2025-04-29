@@ -205,6 +205,18 @@ class User:
             cursor.execute('SELECT r.ReviewID, u.Username, r.ReviewText FROM Reviews r JOIN Users u ON r.UserID = u.UserID WHERE r.ImageURL = ?', (image_url,))
             return [{"id": row[0], "username": row[1], "text": row[2]} for row in cursor.fetchall()]
 
+    def delete_review(self, review_id):
+        try:
+            with pyodbc.connect(self.connection_string) as conn:
+                cursor = conn.cursor()
+                cursor.execute('DELETE FROM Reviews WHERE ReviewID = ?', (review_id,))
+                conn.commit()
+            self.log_action("Deleted review")
+            return True
+        except Exception as e:
+            logging.error(f"Error deleting review: {e}")
+            return False
+
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 
