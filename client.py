@@ -10,7 +10,7 @@ IP = '127.0.0.1'
 PORT = 4000
 
 
-class AnimalImageApp:
+class AnimalImage:
     def __init__(self, root):
         self.root = root
         self.root.title("Animal Images")
@@ -347,3 +347,14 @@ class AnimalImageApp:
             self.start_screen()
         else:
             messagebox.showerror("Error", response.get("message", "Registration failed"))
+
+    def logout(self):
+        self.current_user = None
+        self.is_admin = False
+        self.current_image_url = None
+        self.start_screen()
+
+
+root = Tk()
+app = AnimalImage(root)
+root.mainloop()
