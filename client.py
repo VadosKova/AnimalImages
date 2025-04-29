@@ -108,3 +108,49 @@ class AnimalImageApp:
 
         Button(bottom_frame, text="View Favorites", command=self.show_favorites).grid(row=0, column=0, padx=5)
         Button(bottom_frame, text="Logout", command=self.logout).grid(row=0, column=1, padx=5)
+
+    def load_image(self):
+        category = self.category_var.get()
+        if not category:
+            messagebox.showwarning("Warning", "Please select a category")
+            return
+
+        self.current_category = category
+
+        response = self.send_request({
+            "action": "get_images",
+            "category": category,
+            "username": self.current_user
+        })
+
+        if response and "image_url" in response:
+            self.current_image_url = response["image_url"]
+
+            self.send_request({
+                "action": "view_image",
+                "username": self.current_user,
+                "image_url": self.current_image_url
+            })
+
+            try:
+                response = requests.get(self.current_image_url)
+                if response.status_code == 200:
+                    temp_file = "temp_image.jpg"
+                    with open(temp_file, "wb") as f:
+                        f.write(response.content)
+
+                    img = Image.open(temp_file)
+                    img.thumbnail((self.image_frame.winfo_width(), self.image_frame.winfo_height()))
+
+                    photo = ImageTk.PhotoImage(img)
+                    self.image_label.config(image=photo)
+                    self.image_label.image = photo
+                    self.image_references.append(photo)
+
+                    os.remove(temp_file)
+                else:
+                    messagebox.showerror("Error", "Failed to load image")
+            except Exception as e:
+                messagebox.showerror("Error", f"Image loading error: {e}")
+        else:
+            messagebox.showerror("Error", "Error with server")
