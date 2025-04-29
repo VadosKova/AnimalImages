@@ -154,3 +154,19 @@ class AnimalImageApp:
                 messagebox.showerror("Error", f"Image loading error: {e}")
         else:
             messagebox.showerror("Error", "Error with server")
+
+    def add_to_favorites(self):
+        if not self.current_image_url:
+            messagebox.showwarning("Warning", "No image to add")
+            return
+
+        response = self.send_request({
+            "action": "add_favorite",
+            "username": self.current_user,
+            "image_url": self.current_image_url
+        })
+
+        if response and response.get("message") == "Image added to favorites":
+            messagebox.showinfo("Success", "Added to favorites")
+        else:
+            messagebox.showerror("Error", "Failed to add to favorites")
