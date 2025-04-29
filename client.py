@@ -308,3 +308,24 @@ class AnimalImageApp:
         except Exception as e:
             messagebox.showerror("Error", f"Connection error: {e}")
             return {"error": str(e)}
+
+    def login(self):
+        username = self.username_entry.get()
+        password = self.password_entry.get()
+
+        if not username or not password:
+            messagebox.showerror("Error", "Enter username and password")
+            return
+
+        response = self.send_request({
+            "action": "login",
+            "username": username,
+            "password": password
+        })
+
+        if response.get("message") == "Login successful":
+            self.current_user = username
+            self.is_admin = response.get("is_admin", False)
+            self.main_menu()
+        else:
+            messagebox.showerror("Error", response.get("message", "Login failed"))
