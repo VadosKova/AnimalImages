@@ -199,6 +199,12 @@ class User:
             ''')
             return [{"url": row[0], "favorites_count": row[1], "reviews_count": row[2]} for row in cursor.fetchall()]
 
+    def get_image_reviews(self, image_url):
+        with pyodbc.connect(self.connection_string) as conn:
+            cursor = conn.cursor()
+            cursor.execute('SELECT r.ReviewID, u.Username, r.ReviewText FROM Reviews r JOIN Users u ON r.UserID = u.UserID WHERE r.ImageURL = ?', (image_url,))
+            return [{"id": row[0], "username": row[1], "text": row[2]} for row in cursor.fetchall()]
+
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 
