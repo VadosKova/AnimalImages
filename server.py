@@ -174,7 +174,11 @@ class User:
             cursor.execute('SELECT UserID, Username, Email, IsAdmin FROM Users ORDER BY Username')
             return [{"id": row[0], "username": row[1], "email": row[2], "is_admin": row[3]} for row in cursor.fetchall()]
 
-
+    def get_user_logs(self, user_id):
+        with pyodbc.connect(self.connection_string) as conn:
+            cursor = conn.cursor()
+            cursor.execute('SELECT Action, LogDate FROM UserLogs WHERE UserID = ? ORDER BY LogDate DESC', (user_id,))
+            return [{"action": row[0], "date": row[1].strftime("%Y-%m-%d %H:%M:%S")} for row in cursor.fetchall()]
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
