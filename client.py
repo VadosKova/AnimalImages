@@ -296,3 +296,15 @@ class AnimalImageApp:
             self.show_favorites()
         else:
             messagebox.showerror("Error", "Failed to remove")
+
+    def send_request(self, data):
+        try:
+            client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            client.connect((IP, PORT))
+            client.send(jsonpickle.encode(data).encode('utf-8'))
+            response = client.recv(4096).decode('utf-8')
+            client.close()
+            return jsonpickle.decode(response)
+        except Exception as e:
+            messagebox.showerror("Error", f"Connection error: {e}")
+            return {"error": str(e)}
