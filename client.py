@@ -228,3 +228,57 @@ class AnimalImageApp:
         else:
             error_message = response.get("message", "Failed to download image") or "Unknown error"
             messagebox.showerror("Error", f"Download failed: {error_message}")
+
+    def show_favorites(self):
+        response = self.send_request({
+            "action": "get_favorites",
+            "username": self.current_user
+        })
+
+        if not response or "favorites" not in response or not response["favorites"]:
+            messagebox.showinfo("Info", "You have no favorites yet")
+            return
+
+        favorites = response["favorites"]
+        fav_window = Toplevel(self.root)
+        fav_window.title("My Favorites")
+        fav_window.geometry("500x500")
+
+        canvas = Canvas(fav_window)
+        scrollbar = Scrollbar(fav_window, orient="vertical", command=canvas.yview)
+        scrollable_frame = Frame(canvas)
+
+        scrollable_frame.bind("<Configure>", lambda e: canvas.configure(scrollregion=canvas.bbox("all")))
+
+        canvas.create_window((0, 0), window=scrollable_frame, anchor="nw")
+        canvas.configure(yscrollcommand=scrollbar.set)
+
+        canvas.pack(side="left", fill="both", expand=True)
+        scrollbar.pack(side="right", fill="y")
+
+        for item in favorites:
+            frame = Frame(scrollable_frame)
+            frame.pack(fill="x", padx=5, pady=5)
+
+            try:
+                temp_file = "temp_fav.jpg"
+                with open(temp_file, "wb") as f:
+                    f.write(requests.get(item['image_url']).content)
+
+                img = Image.open(temp_file)
+                img.thumbnail((300, 300))
+                photo = ImageTk.PhotoImage(img)
+
+                label = Label(frame, image=photo)
+                label.image = photo
+                label.pack()
+
+                if item['review_text'] != "No review":
+                    Label(frame, text=f"Review: {item['review_text']}", wraplength=400).pack()
+
+                Button(frame, text="Remove",
+                       command=lambda url=item['image_url']: self.remove_favorite(url, fav_window)).pack()
+
+                os.remove(temp_file)
+            except Exception as e:
+                Label(frame, text=f"Error loading image: {e}").pack()
