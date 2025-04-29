@@ -229,6 +229,20 @@ class User:
             logging.error(f"Error updating admin status: {e}")
             return False
 
+    def delete_image(self, image_url):
+        try:
+            with pyodbc.connect(self.connection_string) as conn:
+                cursor = conn.cursor()
+                cursor.execute('DELETE FROM Favorites WHERE ImageURL = ?', (image_url,))
+                cursor.execute('DELETE FROM Reviews WHERE ImageURL = ?', (image_url,))
+                cursor.execute('DELETE FROM History WHERE ImageURL = ?', (image_url,))
+                conn.commit()
+            self.log_action("Deleted image")
+            return True
+        except Exception as e:
+            logging.error(f"Error deleting image: {e}")
+            return False
+
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 
