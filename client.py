@@ -170,3 +170,37 @@ class AnimalImageApp:
             messagebox.showinfo("Success", "Added to favorites")
         else:
             messagebox.showerror("Error", "Failed to add to favorites")
+
+    def add_review_dialog(self):
+        if not self.current_image_url:
+            messagebox.showwarning("Warning", "No image to review")
+            return
+
+        dialog = Toplevel(self.root)
+        dialog.title("Add Review")
+        dialog.geometry("400x300")
+
+        Label(dialog, text="Your review:").pack(pady=10)
+        review_text = Text(dialog, height=10, width=40)
+        review_text.pack(padx=10, pady=5)
+
+        def submit():
+            text = review_text.get("1.0", END).strip()
+            if not text:
+                messagebox.showwarning("Warning", "Cannot be empty")
+                return
+
+            response = self.send_request({
+                "action": "add_review",
+                "username": self.current_user,
+                "image_url": self.current_image_url,
+                "review_text": text
+            })
+
+            if response and response.get("message") == "Review added":
+                messagebox.showinfo("Success", "Review added")
+                dialog.destroy()
+            else:
+                messagebox.showerror("Error", "Failed to add review")
+
+        Button(dialog, text="Submit", command=submit).pack(pady=10)
