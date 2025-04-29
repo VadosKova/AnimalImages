@@ -329,3 +329,21 @@ class AnimalImageApp:
             self.main_menu()
         else:
             messagebox.showerror("Error", response.get("message", "Login failed"))
+
+    def register(self):
+        if self.register_entries["reg_password"].get() != self.register_entries["reg_confirm_password"].get():
+            messagebox.showerror("Error", "Passwords don't match")
+            return
+
+        response = self.send_request({
+            "action": "register",
+            "username": self.register_entries["reg_username"].get(),
+            "email": self.register_entries["reg_email"].get(),
+            "password": self.register_entries["reg_password"].get()
+        })
+
+        if response.get("message") == "Registration successful":
+            messagebox.showinfo("Success", "Registration successful")
+            self.start_screen()
+        else:
+            messagebox.showerror("Error", response.get("message", "Registration failed"))
