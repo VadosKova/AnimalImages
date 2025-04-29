@@ -168,8 +168,13 @@ class User:
             logging.error(f"Unexpected error from {image_url}: {str(e)}")
             return {"message": f"Unexpected error: {str(e)}"}
 
-    def close_connection(self):
-        self.conn.close()
+    def get_all_users(self):
+        with pyodbc.connect(self.connection_string) as conn:
+            cursor = conn.cursor()
+            cursor.execute('SELECT UserID, Username, Email, IsAdmin FROM Users ORDER BY Username')
+            return [{"id": row[0], "username": row[1], "email": row[2], "is_admin": row[3]} for row in cursor.fetchall()]
+
+
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
