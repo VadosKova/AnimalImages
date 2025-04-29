@@ -204,3 +204,27 @@ class AnimalImageApp:
                 messagebox.showerror("Error", "Failed to add review")
 
         Button(dialog, text="Submit", command=submit).pack(pady=10)
+
+    def download_image(self):
+        if not self.current_image_url:
+            messagebox.showwarning("Warning", "No image to download")
+            return
+
+        file_path = filedialog.asksaveasfilename(initialdir=".", title="Save image", defaultextension=".jpg", filetypes=[("JPEG files", "*.jpg"), ("PNG files", "*.png"), ("All files", "*.*")])
+
+        if not file_path:
+            return
+
+        image_name = os.path.splitext(os.path.basename(file_path))[0]
+        response = self.send_request({
+            "action": "download_image",
+            "username": self.current_user,
+            "image_url": self.current_image_url,
+            "image_name": image_name
+        })
+
+        if response and response.get("message") == "Image downloaded":
+            messagebox.showinfo("Success", f"Image saved on server at {response.get('image_path')}")
+        else:
+            error_message = response.get("message", "Failed to download image") or "Unknown error"
+            messagebox.showerror("Error", f"Download failed: {error_message}")
