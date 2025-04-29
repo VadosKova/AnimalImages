@@ -180,6 +180,25 @@ class User:
             cursor.execute('SELECT Action, LogDate FROM UserLogs WHERE UserID = ? ORDER BY LogDate DESC', (user_id,))
             return [{"action": row[0], "date": row[1].strftime("%Y-%m-%d %H:%M:%S")} for row in cursor.fetchall()]
 
+    def get_all_images(self):
+        with pyodbc.connect(self.connection_string) as conn:
+            cursor = conn.cursor()
+            cursor.execute('''
+                SELECT 
+                    i.ImageURL,
+                    COUNT(DISTINCT f.UserID) as favorites_count,
+                    COUNT(DISTINCT r.ReviewID) as reviews_count
+                FROM (
+                    SELECT ImageURL FROM Favorites
+                    UNION 
+                    SELECT ImageURL FROM History
+                ) i
+                LEFT JOIN Favorites f ON i.ImageURL = f.ImageURL
+                LEFT JOIN Reviews r ON i.ImageURL = r.ImageURL
+                GROUP BY i.ImageURL
+            ''')
+            return [{"url": row[0], "favorites_count": row[1], "reviews_count": row[2]} for row in cursor.fetchall()]
+
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 
