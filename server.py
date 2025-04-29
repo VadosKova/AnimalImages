@@ -304,6 +304,63 @@ def client_request(client):
             favorites = user.get_favorites_with_reviews()
             res = {"favorites": favorites}
 
+        elif action == 'admin_get_users':
+            if user.is_admin():
+                res = {"users": user.get_all_users()}
+            else:
+                res = {"error": "Access denied"}
+
+        elif action == 'admin_get_user_logs':
+            if user.is_admin():
+                res = {"logs": user.get_user_logs(data['user_id'])}
+            else:
+                res = {"error": "Access denied"}
+
+        elif action == 'admin_get_images':
+            if user.is_admin():
+                res = {"images": user.get_all_images()}
+            else:
+                res = {"error": "Access denied"}
+
+        elif action == 'admin_get_image_reviews':
+            if user.is_admin():
+                res = {"reviews": user.get_image_reviews(data['image_url'])}
+            else:
+                res = {"error": "Access denied"}
+
+        elif action == 'admin_delete_review':
+            if user.is_admin():
+                success = user.delete_review(data['review_id'])
+                res = {"success": success, "message": "Review deleted" if success else "Failed to delete review"}
+            else:
+                res = {"error": "Access denied"}
+
+        elif action == 'admin_assign_admin':
+            if user.is_admin():
+                success = user.assign_admin_status(data['user_id'], data['make_admin'])
+                res = {"success": success, "message": "Admin status updated" if success else "Failed to update admin status"}
+            else:
+                res = {"error": "Access denied"}
+
+        elif action == 'admin_delete_image':
+            if user.is_admin():
+                success = user.delete_image(data['image_url'])
+                res = {"success": success, "message": "Image deleted" if success else "Failed to delete image"}
+            else:
+                res = {"error": "Access denied"}
+
+        elif action == 'admin_get_all_reviews':
+            if user.is_admin():
+                reviews = []
+                with pyodbc.connect(user.connection_string) as conn:
+                    cursor = conn.cursor()
+                    cursor.execute('SELECT r.ReviewID, u.Username, r.ImageURL, r.ReviewText FROM Reviews r JOIN Users u ON r.UserID = u.UserID ORDER BY r.ReviewID DESC')
+                    for row in cursor.fetchall():
+                        reviews.append({"id": row[0], "username": row[1], "image_url": row[2], "text": row[3]})
+                res = {"reviews": reviews}
+            else:
+                res = {"error": "Access denied"}
+
         client.send(jsonpickle.encode(res).encode('utf-8'))
     except Exception as e:
         logging.error(f"Error: {e}")
