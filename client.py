@@ -71,3 +71,40 @@ class AnimalImageApp:
 
         Button(self.root, text="Register", command=self.register).pack(pady=10)
         Button(self.root, text="Back", command=self.start_screen).pack()
+
+    def main_menu(self):
+        self.clear_widgets()
+        Label(self.root, text=f"Welcome, {self.current_user}!", font=self.header_font).pack(pady=20)
+
+        categories_frame = Frame(self.root)
+        categories_frame.pack(pady=20)
+
+        Label(categories_frame, text="Choose category:").grid(row=0, column=0, padx=5)
+        self.category_var = StringVar()
+
+        categories = [("Cats", "cats"), ("Dogs", "dogs"), ("Birds", "birds")]
+        for i, (text, value) in enumerate(categories):
+            Radiobutton(categories_frame, text=text, variable=self.category_var,
+                        value=value).grid(row=0, column=i + 1, padx=5)
+
+        Button(self.root, text="Show Images", command=self.load_image).pack(pady=10)
+
+        self.image_frame = Frame(self.root, bg='white', width=600, height=400)
+        self.image_frame.pack(pady=10, fill=BOTH, expand=True)
+        self.image_frame.pack_propagate(False)
+
+        self.image_label = Label(self.image_frame, bg='white')
+        self.image_label.pack(fill=BOTH, expand=True)
+
+        actions_frame = Frame(self.root)
+        actions_frame.pack(pady=10)
+
+        Button(actions_frame, text="Add to Favorites", command=self.add_to_favorites).grid(row=0, column=0, padx=5)
+        Button(actions_frame, text="Add Review", command=self.add_review_dialog).grid(row=0, column=1, padx=5)
+        Button(actions_frame, text="Download", command=self.download_image).grid(row=0, column=2, padx=5)
+
+        bottom_frame = Frame(self.root)
+        bottom_frame.pack(pady=10)
+
+        Button(bottom_frame, text="View Favorites", command=self.show_favorites).grid(row=0, column=0, padx=5)
+        Button(bottom_frame, text="Logout", command=self.logout).grid(row=0, column=1, padx=5)
