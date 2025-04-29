@@ -282,3 +282,17 @@ class AnimalImageApp:
                 os.remove(temp_file)
             except Exception as e:
                 Label(frame, text=f"Error loading image: {e}").pack()
+
+    def remove_favorite(self, image_url, window):
+        response = self.send_request({
+            "action": "remove_favorite",
+            "username": self.current_user,
+            "image_url": image_url
+        })
+
+        if response and response.get("message") == "Favorite removed":
+            messagebox.showinfo("Success", "Removed from favorites")
+            window.destroy()
+            self.show_favorites()
+        else:
+            messagebox.showerror("Error", "Failed to remove")
