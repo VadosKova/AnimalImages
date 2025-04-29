@@ -48,3 +48,26 @@ class AnimalImageApp:
 
         Button(self.root, text="Login", command=self.login).pack(pady=10)
         Button(self.root, text="Register", command=self.register_screen).pack()
+
+    def register_screen(self):
+        self.clear_widgets()
+        Label(self.root, text="Register account", font=self.header_font).pack(pady=10)
+
+        fields = [
+            ("Username:", "reg_username"),
+            ("Email:", "reg_email"),
+            ("Password:", "reg_password"),
+            ("Confirm password:", "reg_confirm_password")
+        ]
+
+        self.register_entries = {}
+        for label, name in fields:
+            Label(self.root, text=label).pack()
+            entry = Entry(self.root)
+            if "password" in name:
+                entry.config(show="*")
+            entry.pack()
+            self.register_entries[name] = entry
+
+        Button(self.root, text="Register", command=self.register).pack(pady=10)
+        Button(self.root, text="Back", command=self.start_screen).pack()
