@@ -163,3 +163,22 @@ class AdminPanel:
             "image_url": image_url
         })
         return res.get("reviews", [])
+
+    def delete_selected_image(self):
+        selected = self.tree.focus()
+        if not selected:
+            messagebox.showwarning("Warning", "Select an image first")
+            return
+
+        if messagebox.askyesno("Confirm", "Are you sure?"):
+            image_url = self.tree.item(selected)["values"][0]
+            res = send_request({
+                "action": "admin_delete_image",
+                "username": self.username,
+                "image_url": image_url
+            })
+            if res.get("success"):
+                messagebox.showinfo("Success", "Image deleted successfully")
+                self.show_images()
+            else:
+                messagebox.showerror("Error", res.get("message", "Failed to delete image"))
