@@ -16,3 +16,13 @@ def send_request(data):
         s.send(jsonpickle.encode(data).encode('utf-8'))
         response = s.recv(8192).decode('utf-8')
         return jsonpickle.decode(response)
+
+
+class AdminPanel:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("Animal Images Admin Panel")
+        self.username = None
+        self.current_image_url = None
+        self.image_references = []
+        self.login_screen()
