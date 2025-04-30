@@ -182,3 +182,36 @@ class AdminPanel:
                 self.show_images()
             else:
                 messagebox.showerror("Error", res.get("message", "Failed to delete image"))
+
+    def view_user_logs(self):
+        self.clear_widgets()
+        Label(self.root, text="User Activity Logs", font=('Arial', 16)).pack(pady=10)
+
+        users_res = send_request({
+            "action": "admin_get_users",
+            "username": self.username
+        })
+
+        if "users" not in users_res:
+            messagebox.showerror("Error", "Failed to load users")
+            self.main_menu()
+            return
+
+        user_frame = Frame(self.root)
+        user_frame.pack(pady=10)
+
+        Label(user_frame, text="Select User:").pack(side=LEFT)
+        self.user_var = StringVar()
+        user_dropdown = ttk.Combobox(user_frame, textvariable=self.user_var)
+        user_dropdown['values'] = [f"{u['id']}: {u['username']}" for u in users_res["users"]]
+        user_dropdown.pack(side=LEFT, padx=5)
+        Button(user_frame, text="Show Logs", command=self.show_user_logs).pack(side=LEFT)
+
+        self.logs_tree = ttk.Treeview(self.root, columns=("action", "date"), show="headings")
+        self.logs_tree.heading("action", text="Action")
+        self.logs_tree.heading("date", text="Date")
+        self.logs_tree.column("action", width=400)
+        self.logs_tree.column("date", width=150)
+        self.logs_tree.pack(fill=BOTH, expand=True, padx=10, pady=10)
+
+        Button(self.root, text="Back", command=self.main_menu).pack(pady=10)
