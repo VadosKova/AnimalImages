@@ -339,3 +339,19 @@ class AdminPanel:
             self.manage_users()
         else:
             messagebox.showerror("Error", res.get("message", "Failed to update user status"))
+
+    def view_selected_user_logs(self):
+        selected = self.users_tree.focus()
+        if not selected:
+            messagebox.showwarning("Warning", "Select a user first")
+            return
+
+        user_id = self.users_tree.item(selected, "tags")[0]
+        self.view_user_logs()
+        self.user_var.set(f"{user_id}: {self.users_tree.item(selected)['values'][0]}")
+        self.show_user_logs()
+
+
+root = Tk()
+app = AdminPanel(root)
+root.mainloop()
