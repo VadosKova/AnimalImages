@@ -26,3 +26,8 @@ class AdminPanel:
         self.current_image_url = None
         self.image_references = []
         self.login_screen()
+
+    def clear_widgets(self):
+        for widget in self.root.winfo_children():
+            widget.destroy()
+        self.image_references = []
