@@ -265,3 +265,22 @@ class AdminPanel:
 
         Button(btn_frame, text="Delete Review", command=self.delete_selected_review).pack(side=LEFT, padx=5)
         Button(btn_frame, text="Back", command=self.main_menu).pack(side=LEFT, padx=5)
+
+    def delete_selected_review(self):
+        selected = self.reviews_tree.focus()
+        if not selected:
+            messagebox.showwarning("Warning", "Select a review first")
+            return
+
+        review_id = self.reviews_tree.item(selected, "tags")[0]
+        if messagebox.askyesno("Confirm", "Delete this review?"):
+            res = send_request({
+                "action": "admin_delete_review",
+                "username": self.username,
+                "review_id": review_id
+            })
+            if res.get("success"):
+                messagebox.showinfo("Success", "Review deleted")
+                self.moderate_reviews()
+            else:
+                messagebox.showerror("Error", res.get("message", "Failed to delete review"))
