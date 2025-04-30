@@ -63,7 +63,7 @@ class AdminPanel:
 
     def main_menu(self):
         self.clear_widgets()
-        Label(self.root, text=f"Welcome, Admin {self.username}", font=('Arial', 16)).pack(pady=10)
+        Label(self.root, text=f"Welcome, {self.username} (admin)", font=('Arial', 16)).pack(pady=10)
 
         Button(self.root, text="Manage Images", command=self.manage_images).pack(pady=5)
         Button(self.root, text="View User Logs", command=self.view_user_logs).pack(pady=5)
