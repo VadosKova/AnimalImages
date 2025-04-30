@@ -317,3 +317,25 @@ class AdminPanel:
         Button(btn_frame, text="Assign Admin", command=self.assign_admin_status).pack(side=LEFT, padx=5)
         Button(btn_frame, text="View Logs", command=self.view_selected_user_logs).pack(side=LEFT, padx=5)
         Button(btn_frame, text="Back", command=self.main_menu).pack(side=LEFT, padx=5)
+
+    def assign_admin_status(self):
+        selected = self.users_tree.focus()
+        if not selected:
+            messagebox.showwarning("Warning", "Select a user first")
+            return
+
+        user_id = self.users_tree.item(selected, "tags")[0]
+        current_status = self.users_tree.item(selected)["values"][2] == "Yes"
+
+        res = send_request({
+            "action": "admin_assign_admin",
+            "username": self.username,
+            "user_id": user_id,
+            "make_admin": not current_status
+        })
+
+        if res.get("success"):
+            messagebox.showinfo("Success", "User status updated")
+            self.manage_users()
+        else:
+            messagebox.showerror("Error", res.get("message", "Failed to update user status"))
