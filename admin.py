@@ -108,3 +108,50 @@ class AdminPanel:
             self.tree.delete(*self.tree.get_children())
             for image in res["images"]:
                 self.tree.insert("", "end", values=(image["url"], image["favorites_count"], image["reviews_count"]))
+
+    def view_image_details(self):
+        selected = self.tree.focus()
+        if not selected:
+            messagebox.showwarning("Warning", "Select an image")
+            return
+
+        image_url = self.tree.item(selected)["values"][0]
+
+        details_window = Toplevel(self.root)
+        details_window.title("Image Details")
+        details_window.geometry("600x600")
+
+        try:
+            response = requests.get(image_url)
+            if response.status_code == 200:
+                temp_file = "temp_admin_image.jpg"
+                with open(temp_file, "wb") as f:
+                    f.write(response.content)
+
+                img = Image.open(temp_file)
+                img.thumbnail((300, 300))
+                photo = ImageTk.PhotoImage(img)
+
+                image_label = Label(details_window, image=photo)
+                image_label.image = photo
+                self.image_references.append(photo)
+                image_label.pack(pady=10)
+
+                os.remove(temp_file)
+            else:
+                Label(details_window, text="Failed to load image", font=('Arial', 10)).pack(pady=10)
+        except Exception as e:
+            Label(details_window, text=f"Error loading image: {e}", font=('Arial', 10)).pack(pady=10)
+
+        Label(details_window, text=f"URL: {image_url}", font=('Arial', 10), wraplength=550).pack(pady=5)
+
+        reviews = self.get_image_reviews(image_url)
+        if reviews:
+            Label(details_window, text="Reviews:", font=('Arial', 10, 'bold')).pack(pady=5)
+            for review in reviews:
+                frame = Frame(details_window, bd=1, relief=SOLID)
+                frame.pack(fill=X, padx=5, pady=2)
+                Label(frame, text=f"{review['username']}: {review['text']}",
+                      wraplength=500, justify=LEFT).pack(anchor='w')
+        else:
+            Label(details_window, text="No reviews available", font=('Arial', 10)).pack(pady=5)
