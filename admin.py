@@ -233,3 +233,35 @@ class AdminPanel:
             self.logs_tree.delete(*self.logs_tree.get_children())
             for log in res["logs"]:
                 self.logs_tree.insert("", "end", values=(log["action"], log["date"]))
+
+    def moderate_reviews(self):
+        self.clear_widgets()
+        Label(self.root, text="Moderate Reviews", font=('Arial', 16)).pack(pady=10)
+
+        res = send_request({
+            "action": "admin_get_all_reviews",
+            "username": self.username
+        })
+
+        if "reviews" not in res:
+            messagebox.showerror("Error", "Failed to load reviews")
+            self.main_menu()
+            return
+
+        self.reviews_tree = ttk.Treeview(self.root, columns=("user", "image", "review"), show="headings")
+        self.reviews_tree.heading("user", text="User")
+        self.reviews_tree.heading("image", text="Image")
+        self.reviews_tree.heading("review", text="Review")
+        self.reviews_tree.column("user", width=150)
+        self.reviews_tree.column("image", width=200)
+        self.reviews_tree.column("review", width=300)
+        self.reviews_tree.pack(fill=BOTH, expand=True, padx=10, pady=10)
+
+        for review in res["reviews"]:
+            self.reviews_tree.insert("", "end", values=(review["username"], review["image_url"], review["text"]), tags=(review["id"],))
+
+        btn_frame = Frame(self.root)
+        btn_frame.pack(pady=10)
+
+        Button(btn_frame, text="Delete Review", command=self.delete_selected_review).pack(side=LEFT, padx=5)
+        Button(btn_frame, text="Back", command=self.main_menu).pack(side=LEFT, padx=5)
