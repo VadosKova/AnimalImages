@@ -97,3 +97,14 @@ class AdminPanel:
         Button(action_frame, text="Delete Image", command=self.delete_selected_image).pack(side=LEFT, padx=5)
 
         self.show_images()
+
+    def show_images(self):
+        res = send_request({
+            "action": "admin_get_images",
+            "username": self.username
+        })
+
+        if "images" in res:
+            self.tree.delete(*self.tree.get_children())
+            for image in res["images"]:
+                self.tree.insert("", "end", values=(image["url"], image["favorites_count"], image["reviews_count"]))
