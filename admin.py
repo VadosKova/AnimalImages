@@ -155,3 +155,11 @@ class AdminPanel:
                       wraplength=500, justify=LEFT).pack(anchor='w')
         else:
             Label(details_window, text="No reviews available", font=('Arial', 10)).pack(pady=5)
+
+    def get_image_reviews(self, image_url):
+        res = send_request({
+            "action": "admin_get_image_reviews",
+            "username": self.username,
+            "image_url": image_url
+        })
+        return res.get("reviews", [])
