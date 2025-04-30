@@ -215,3 +215,21 @@ class AdminPanel:
         self.logs_tree.pack(fill=BOTH, expand=True, padx=10, pady=10)
 
         Button(self.root, text="Back", command=self.main_menu).pack(pady=10)
+
+    def show_user_logs(self):
+        user_str = self.user_var.get()
+        if not user_str:
+            messagebox.showwarning("Warning", "Select a user first")
+            return
+
+        user_id = user_str.split(":")[0]
+        res = send_request({
+            "action": "admin_get_user_logs",
+            "username": self.username,
+            "user_id": user_id
+        })
+
+        if "logs" in res:
+            self.logs_tree.delete(*self.logs_tree.get_children())
+            for log in res["logs"]:
+                self.logs_tree.insert("", "end", values=(log["action"], log["date"]))
