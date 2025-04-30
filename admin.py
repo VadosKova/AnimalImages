@@ -42,3 +42,21 @@ class AdminPanel:
         self.password_entry = Entry(self.root, show='*')
         self.password_entry.pack()
         Button(self.root, text="Login", command=self.login).pack(pady=10)
+
+    def login(self):
+        username = self.username_entry.get()
+        password = self.password_entry.get()
+
+        res = send_request({
+            "action": "login",
+            "username": username,
+            "password": password
+        })
+
+        if res.get("message") == "Login successful" and res.get("is_admin"):
+            self.username = username
+            self.main_menu()
+        elif res.get("message") == "Login successful":
+            messagebox.showerror("Access denied", "You are not an admin")
+        else:
+            messagebox.showerror("Error", res.get("message", "Unknown error"))
