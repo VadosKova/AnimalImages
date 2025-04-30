@@ -31,3 +31,14 @@ class AdminPanel:
         for widget in self.root.winfo_children():
             widget.destroy()
         self.image_references = []
+
+    def login_screen(self):
+        self.clear_widgets()
+        Label(self.root, text="Admin Authorization", font=('Arial', 18)).pack(pady=10)
+        Label(self.root, text="Username").pack()
+        self.username_entry = Entry(self.root)
+        self.username_entry.pack()
+        Label(self.root, text="Password").pack()
+        self.password_entry = Entry(self.root, show='*')
+        self.password_entry.pack()
+        Button(self.root, text="Login", command=self.login).pack(pady=10)
