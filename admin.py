@@ -284,3 +284,36 @@ class AdminPanel:
                 self.moderate_reviews()
             else:
                 messagebox.showerror("Error", res.get("message", "Failed to delete review"))
+
+    def manage_users(self):
+        self.clear_widgets()
+        Label(self.root, text="Manage Users", font=('Arial', 16)).pack(pady=10)
+
+        res = send_request({
+            "action": "admin_get_users",
+            "username": self.username
+        })
+
+        if "users" not in res:
+            messagebox.showerror("Error", "Failed to load users")
+            self.main_menu()
+            return
+
+        self.users_tree = ttk.Treeview(self.root, columns=("username", "email", "is_admin"), show="headings")
+        self.users_tree.heading("username", text="Username")
+        self.users_tree.heading("email", text="Email")
+        self.users_tree.heading("is_admin", text="Is Admin")
+        self.users_tree.column("username", width=150)
+        self.users_tree.column("email", width=200)
+        self.users_tree.column("is_admin", width=100)
+        self.users_tree.pack(fill=BOTH, expand=True, padx=10, pady=10)
+
+        for user in res["users"]:
+            self.users_tree.insert("", "end", values=(user["username"], user["email"], "Yes" if user["is_admin"] else "No"), tags=(user["id"],))
+
+        btn_frame = Frame(self.root)
+        btn_frame.pack(pady=10)
+
+        Button(btn_frame, text="Assign Admin", command=self.assign_admin_status).pack(side=LEFT, padx=5)
+        Button(btn_frame, text="View Logs", command=self.view_selected_user_logs).pack(side=LEFT, padx=5)
+        Button(btn_frame, text="Back", command=self.main_menu).pack(side=LEFT, padx=5)
